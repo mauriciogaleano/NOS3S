@@ -1,22 +1,90 @@
-.page {
-  background: white;
+body {
+  font-family: 'Arial', sans-serif;
+  margin: 0;
   padding: 20px;
-  margin: 20px 0;
-  border-radius: 8px;
+  background: #f8f9fa;
 }
 
-.buttons {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 20px;
+.app {
+  max-width: 600px;
+  margin: 40px auto;
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
-label {
+.biometric-screen h1 {
+  color: #2c3e50;
+  margin-bottom: 10px;
+}
+
+.biometric-screen p {
+  color: #7f8c8d;
+  margin-bottom: 30px;
+}
+
+.input-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 25px;
+}
+
+.input-group {
+  margin-bottom: 20px;
+}
+
+.input-group label {
   display: block;
-  margin: 10px 0;
-  cursor: pointer;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #34495e;
 }
 
-input[type="radio"] {
-  margin-right: 10px;
+.input-group input {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: border-color 0.3s;
+}
+
+.input-group input:focus {
+  border-color: #4285f4;
+  outline: none;
+}
+
+.input-group input::placeholder {
+  color: #bdc3c7;
+}
+
+.submit-button {
+  display: block;
+  width: 100%;
+  padding: 15px;
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 30px;
+  transition: all 0.3s;
+}
+
+.submit-button.active {
+  background: #4285f4;
+  color: white;
+}
+
+.submit-button.active:hover {
+  background: #3367d6;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.submit-button.disabled {
+  background: #ecf0f1;
+  color: #bdc3c7;
+  cursor: not-allowed;
 }

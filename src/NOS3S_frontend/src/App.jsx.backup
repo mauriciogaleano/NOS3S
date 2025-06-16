@@ -54,7 +54,7 @@ export default function App() {
   };
 
   return (
-    <div className="app">
+    <div className="app" style={{ minHeight: "100vh" }}>
       {questions[currentStep].type === "hrv" ? (
         <div className="hrv-input-screen">
           <h2>{questions[currentStep].title}</h2>
