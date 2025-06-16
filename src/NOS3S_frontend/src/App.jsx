@@ -10,6 +10,7 @@ export default function App() {
     height: '',
     weight: ''
   });
+  const [answers, setAnswers] = useState([]);
 
   const questions = [
     {
@@ -25,11 +26,11 @@ export default function App() {
     },
     {
       type: "slider",
-      title: "Environmental Stress",
-      question: "How chaotic or orderly does your environment feel?",
+      title: "Environmental Stressor Load",
+      question: "How chaotic or orderly does your current environment feel?",
       descriptors: [
         "Complete chaos (overwhelming)",
-        "Disorganized",
+        "Somewhat chaotic",
         "Neutral",
         "Mostly orderly",
         "Perfectly orderly (controlled)"
@@ -37,8 +38,8 @@ export default function App() {
     },
     {
       type: "slider", 
-      title: "Body Awareness",
-      question: "How connected do you feel to your body?",
+      title: "Somatic Awareness",
+      question: "How connected do you feel to your body's physical signals right now?",
       descriptors: [
         "Completely disconnected",
         "Somewhat numb",
@@ -46,11 +47,85 @@ export default function App() {
         "Clearly noticeable",
         "Highly attuned"
       ]
+    },
+    {
+      type: "slider",
+      title: "Social Resonance",
+      question: "How harmoniously are you interacting with others?",
+      descriptors: [
+        "Conflict/withdrawal",
+        "Some tension",
+        "Neutral",
+        "Mostly harmonious",
+        "Deep connection"
+      ]
+    },
+    {
+      type: "slider",
+      title: "Cognitive Load",
+      question: "How scattered or focused are your thoughts?",
+      descriptors: [
+        "Racing/overwhelmed",
+        "Some distraction",
+        "Some mental chatter",
+        "Mostly focused",
+        "Laser-focused"
+      ]
+    },
+    {
+      type: "slider",
+      title: "Energy State",
+      question: "How would you describe your energy quality?",
+      descriptors: [
+        "Drained/exhausted",
+        "Some fatigue",
+        "Neutral",
+        "Mostly energized",
+        "Effortless vitality"
+      ]
     }
   ];
 
   const allFieldsFilled = () => {
     return biometrics.hrv && biometrics.age && biometrics.height && biometrics.weight;
+  };
+
+  const calculateStressLevel = () => {
+    if (answers.length < 6) return "Incomplete assessment";
+    
+    const hrv = Number(answers[0].hrv);
+    const questionResponses = answers.slice(1).map(a => Number(a));
+    
+    // Weighted calculation based on scientific literature
+    const hrvScore = (hrv / 100) * 40; // 40% weight
+    const envScore = (6 - questionResponses[0]) * 5; // Reverse scored
+    const bodyScore = questionResponses[1] * 5;
+    const socialScore = questionResponses[2] * 5;
+    const cognitiveScore = (6 - questionResponses[3]) * 5; // Reverse scored
+    const energyScore = questionResponses[4] * 5;
+    
+    const totalScore = Math.min(100, 
+      hrvScore + envScore + bodyScore + socialScore + cognitiveScore + energyScore
+    );
+    
+    if (totalScore >= 80) return "Optimal Resilience";
+    if (totalScore >= 60) return "Moderate Stress";
+    if (totalScore >= 40) return "High Stress";
+    return "Autonomic Dysfunction";
+  };
+
+  const handleComplete = (value) => {
+    const newAnswers = [...answers, value];
+    setAnswers(newAnswers);
+    
+    if (currentStep === 0) {
+      setCurrentStep(1);
+    } else if (currentStep < questions.length - 1) {
+      setCurrentStep(currentStep + 1);
+    } else {
+      const result = calculateStressLevel();
+      alert(`Assessment Complete!\nYour Stress Level: ${result}`);
+    }
   };
 
   return (
@@ -81,7 +156,7 @@ export default function App() {
 
           <button
             className={`submit-button ${allFieldsFilled() ? 'active' : 'disabled'}`}
-            onClick={() => allFieldsFilled() && setCurrentStep(1)}
+            onClick={() => handleComplete(biometrics)}
             disabled={!allFieldsFilled()}
           >
             Continue to Questions
@@ -91,7 +166,9 @@ export default function App() {
         <StressSlider
           question={questions[currentStep].question}
           descriptors={questions[currentStep].descriptors}
-          onComplete={() => setCurrentStep(currentStep + 1)}
+          onComplete={handleComplete}
+          currentQuestion={currentStep}
+          totalQuestions={questions.length - 1}
         />
       )}
     </div>

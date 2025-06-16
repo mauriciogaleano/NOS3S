@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import './StressSlider.css';
 
-export default function StressSlider({ question, descriptors, onComplete }) {
+export default function StressSlider({ question, descriptors, onComplete, currentQuestion, totalQuestions }) {
   const [value, setValue] = useState(3);
   const [bgColor, setBgColor] = useState('rgb(100, 150, 255)');
 
-  // Dynamic background color based on value (1-5)
   useEffect(() => {
     const red = Math.floor(255 - (value * 40));
     const green = Math.floor(100 + (value * 20));
@@ -23,6 +22,15 @@ export default function StressSlider({ question, descriptors, onComplete }) {
         transition: 'background-color 0.5s ease'
       }}
     >
+      <div style={{
+        color: 'white',
+        textAlign: 'center',
+        marginBottom: '1rem',
+        fontWeight: 'bold'
+      }}>
+        Question {currentQuestion} of {totalQuestions}
+      </div>
+      
       <h2 style={{ color: 'white', textAlign: 'center' }}>{question}</h2>
       
       <div style={{
@@ -60,7 +68,7 @@ export default function StressSlider({ question, descriptors, onComplete }) {
       </div>
 
       <button 
-        onClick={onComplete}
+        onClick={() => onComplete(value)}
         style={{
           background: 'rgba(255,255,255,0.2)',
           border: '2px solid white',
@@ -73,7 +81,7 @@ export default function StressSlider({ question, descriptors, onComplete }) {
           cursor: 'pointer'
         }}
       >
-        {onComplete ? 'Next Question' : 'Complete Assessment'}
+        {currentQuestion < totalQuestions ? 'Next Question' : 'See Results'}
       </button>
     </div>
   );
