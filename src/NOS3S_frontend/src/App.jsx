@@ -1,77 +1,88 @@
-import { NOS3S_backend } from '../../declarations/NOS3S_backend';
-import { useState, useEffect } from 'react';
+import React, { useState } from "react";
+import StressSlider from "./components/StressSlider";
+import "./index.scss";
 
 export default function App() {
-  const [status, setStatus] = useState({ 
-    message: 'Connecting...', 
-    isConnected: false, 
-    points: null 
-  });
+  const [currentStep, setCurrentStep] = useState(0);
+  const [answers, setAnswers] = useState([]);
+  const [hrvValue, setHrvValue] = useState("");
 
-  const testConnection = async () => {
-    console.log(NOS3S_backend);
-    try {
-      console.log("Backend instance:", NOS3S_backend);
-      
-      if (!NOS3S_backend) {
-        throw new Error("NOS3S_backend canister not initialized");
-      }
+  const questions = [
+    {
+      type: "hrv",
+      title: "HRV Measurement",
+      question: "Enter your HRV reading (ms):",
+      range: [20, 120]
+    },
+    {
+      type: "slider",
+      title: "Environmental Stress",
+      question: "Rate your environment:",
+      descriptors: [
+        "Chaotic (overstimulating)",
+        "Busy (moderate stress)",
+        "Neutral",
+        "Calm",
+        "Serene (peaceful)"
+      ]
+    },
+    {
+      type: "slider", 
+      title: "Physical State",
+      question: "Rate your physical tension:",
+      descriptors: [
+        "Very tense",
+        "Some tension",
+        "Neutral",
+        "Relaxed",
+        "Very relaxed"
+      ]
+    }
+  ];
 
-      // Test API methods
-      await NOS3S_backend.register("default");
-      const points = await NOS3S_backend.getPoints();
-      const user = await NOS3S_backend.getUser();
-
-      setStatus({
-        message: '✅ Connected successfully!',
-        isConnected: true,
-        points
-      });
-    } catch (error) {
-      console.error("Connection error:", error);
-      setStatus({
-        message: `❌ Failed: ${error.message}`,
-        isConnected: false,
-        points: null
-      });
+  const handleSubmit = (value) => {
+    const newAnswers = [...answers, value];
+    setAnswers(newAnswers);
+    
+    // Fixed navigation logic
+    if (currentStep + 1 < questions.length) {
+      setCurrentStep(currentStep + 1);
+    } else {
+      console.log("Assessment complete:", newAnswers);
+      // Process results here
     }
   };
 
-  // Auto-test on mount
-  useEffect(() => { testConnection(); }, []);
-
   return (
-    <div style={{
-      padding: '20px',
-      maxWidth: '600px',
-      margin: '0 auto',
-      fontFamily: 'sans-serif'
-    }}>
-      <h1>NOS3S Connection Test</h1>
-      <div style={{
-        padding: '15px',
-        margin: '20px 0',
-        background: status.isConnected ? '#e8f5e9' : '#ffebee',
-        borderRadius: '8px'
-      }}>
-        <p>{status.message}</p>
-        {status.points !== null && (
-          <p>Points: <strong>{status.points}</strong></p>
-        )}
-      </div>
-      <button
-        onClick={testConnection}
-        style={{
-          padding: '10px 20px',
-          background: '#1976d2',
-          color: 'white',
-          border: 'none',
-          borderRadius: '4px',
-          cursor: 'pointer'
-        }}
-      >
-        Test Again
-      </button>
+    <div className="app">
+      {questions[currentStep].type === "hrv" ? (
+        <div className="hrv-input-screen">
+          <h2>{questions[currentStep].title}</h2>
+          <p>{questions[currentStep].question}</p>
+          <input
+            type="number"
+            min={questions[currentStep].range[0]}
+            max={questions[currentStep].range[1]}
+            value={hrvValue}
+            onChange={(e) => setHrvValue(e.target.value)}
+            className="hrv-input"
+          />
+          <button 
+            onClick={() => hrvValue && handleSubmit(hrvValue)}
+            className="submit-button"
+            disabled={!hrvValue}
+          >
+            Next
+          </button>
+        </div>
+      ) : (
+        <StressSlider
+          question={questions[currentStep].question}
+          descriptors={questions[currentStep].descriptors}
+          onValueChange={handleSubmit}
+          isLastStep={currentStep === questions.length - 1}
+        />
+      )}
     </div>
   );
 }
