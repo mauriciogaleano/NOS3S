@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import StressSlider from './components/Biofeedback/StressSlider';
 import './index.scss';
 
-export default function App() {
-  const [currentStep, setCurrentStep] = useState(0);
+export default function App(props) {
+    const [currentStep, setCurrentStep] = useState(0);
   const [biometrics, setBiometrics] = useState({
     hrv: '',
     age: '',
